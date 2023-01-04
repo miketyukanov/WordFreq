@@ -60,7 +60,12 @@ inline static node_t * create_new_node(char *word, int word_len)
 
 int add_to_hash_table(char *word, int word_len)
 {
-	unsigned short hash_val = 0xFFFF & HASH_FUNC((unsigned char *)word, word_len);
+//uncomment this if you are testing good hashfuncs for speed, and don't forget
+//to change by comment-uncomment HASH_TABLE_SIZE to 0x10000
+//	unsigned int hash_val = 0xFFFF & HASH_FUNC((unsigned char *)word, word_len);
+//uncommet this if you are testing more primitive hashfuncs, this will significantly
+//lessen collisions, don't forget to change HASH_TABLE_SIZE to a prime number
+	unsigned int hash_val = (HASH_FUNC((unsigned char*)word, word_len)) % HASH_TABLE_SIZE;
 	if(!hash_table[hash_val].entries)
 	{
 		assert(!hash_table[hash_val].list_head);
@@ -127,8 +132,8 @@ void print_hash_table_stat(void)
 			} while(node_ptr);
 		}
 	}//!!! NOTE: is hash_table still valid after that? seems so, but another array implementation could change that!
-	printf("\n\nTotal hash table usage: Used buckets = %d, total collisions = %ld, maximal collisions = %ld\n", 
-			used_entries, total_collisions, max_collisions);
+	printf("\n\nTotal hash table usage: Total buckets =%d, used buckets = %d, total collisions = %ld, maximal collisions = %ld\n", 
+			HASH_TABLE_SIZE, used_entries, total_collisions, max_collisions);
 	
 	comp_fun_ptr_t comp_fun=compare_nodeptrs;
 	qsort(vector.data, vector.size, sizeof(node_t*), comp_fun);
